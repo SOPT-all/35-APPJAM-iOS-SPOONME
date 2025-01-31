@@ -40,7 +40,7 @@ final class RegisterStore: ObservableObject {
     @Published private(set) var state: RegisterState = RegisterState()
     
     private let network: RegisterServiceType = RegisterService()
-    private let navigationManager: NavigationManager
+    private var navigationManager: NavigationManager
     
     init(navigationManager: NavigationManager) {
         self.navigationManager = navigationManager
@@ -322,11 +322,11 @@ extension RegisterStore {
                     if success {
                         state.registerStep = .end
                         state.isLoading = false
-                        navigationManager.popup = .registerSuccess(action: {
-                            self.navigationManager.selectedTab = .explore
+                        navigationManager.dispatch(.showPopup(.registerSuccess(action: {
+                            self.navigationManager.dispatch(.changeTab(.explore))
                             self.state = .init()
                             self.state.isToolTipPresented = false
-                        })
+                        })))
                     } else {
                         state.isLoading = false
                         print("Error")

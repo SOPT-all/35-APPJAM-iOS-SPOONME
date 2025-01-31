@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct SpoonyTabView: View {
-    
     @EnvironmentObject var navigationManager: NavigationManager
     
     init() {
@@ -17,12 +16,20 @@ struct SpoonyTabView: View {
     
     var body: some View {
         
-        TabView(selection: $navigationManager.selectedTab) {
+        TabView(selection: Binding(get: {
+            navigationManager.state.selectedTab
+        }, set: { newValue in
+            navigationManager.dispatch(.changeTab(newValue))
+        })) {
             ForEach(TabType.allCases, id: \.self) { tab in
                 Group {
                     switch tab {
                     case .map:
-                        NavigationStack(path: $navigationManager.mapPath) {
+                        NavigationStack(path: Binding(get: {
+                            navigationManager.state.mapPath
+                        }, set: { newValue in
+                            navigationManager.dispatch(.changePath(newValue, .map))
+                        })) {
                             Home()
                                 .navigationDestination(for: ViewType.self) { view in
                                     navigationManager.build(view)
@@ -30,15 +37,23 @@ struct SpoonyTabView: View {
                                 }
                         }
                     case .explore:
-                        NavigationStack(path: $navigationManager.explorePath) {
-                            Explore()
+                        NavigationStack(path: Binding(get: {
+                            navigationManager.state.explorePath
+                        }, set: { newValue in
+                            navigationManager.dispatch(.changePath(newValue, .explore))
+                        })) {
+                            Explore(store: .init(navigationManager: navigationManager))
                                 .navigationDestination(for: ViewType.self) { view in
                                     navigationManager.build(view)
                                         .navigationBarBackButtonHidden()
                                 }
                         }
                     case .register:
-                        NavigationStack(path: $navigationManager.registerPath) {
+                        NavigationStack(path: Binding(get: {
+                            navigationManager.state.registerPath
+                        }, set: { newValue in
+                            navigationManager.dispatch(.changePath(newValue, .register))
+                        })) {
                             Register(
                                 store: .init(navigationManager: navigationManager)
                             )
@@ -52,7 +67,7 @@ struct SpoonyTabView: View {
                 .tabItem {
                     Label(
                         tab.title,
-                        image: tab.imageName(selected: navigationManager.selectedTab == tab)
+                        image: tab.imageName(selected: navigationManager.state.selectedTab == tab)
                     )
                 }
                 .tag(tab)

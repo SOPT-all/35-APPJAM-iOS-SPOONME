@@ -42,7 +42,7 @@ struct DetailView: View {
                 style: .detailWithChip,
                 spoonCount: store.state.spoonCount,
                 onBackTapped: {
-                    navigationManager.pop(1)
+                    navigationManager.dispatch(.pop(1))
                 }
             )
             ScrollView(.vertical) {
@@ -66,7 +66,7 @@ struct DetailView: View {
                 store.send(intent: .getInitialValue(userId: Config.userId, postId: postId))
                 
                 if !store.state.successService {
-                    navigationManager.pop(1)
+                    navigationManager.dispatch(.pop(1))
                 }
                 
             }
@@ -290,9 +290,9 @@ extension DetailView {
                 if store.state.isScoop {
                     store.send(intent: .pathInfoInNaverMaps)
                 } else {
-                    navigationManager.popup = .useSpoon(action: {
+                    navigationManager.dispatch(.showPopup(.useSpoon(action: {
                         store.send(intent: .scoopButtonDidTap)
-                    })
+                    })))
                 }
                 
                 print("⭐️")
@@ -314,7 +314,7 @@ extension DetailView {
                     items: ["신고하기"],
                     isPresented: $isPresented
                 ) { _ in
-                    navigationManager.push(.report(postId: postId))
+                    navigationManager.dispatch(.push(.report(postId: store.state.postId)))
                 }
                 .frame(alignment: .topTrailing)
                 .padding(.top, 48.adjustedH)

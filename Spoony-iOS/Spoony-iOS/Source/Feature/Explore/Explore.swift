@@ -10,8 +10,7 @@ import SwiftUI
 import Lottie
 
 struct Explore: View {
-    @EnvironmentObject private var navigationManager: NavigationManager
-    @StateObject private var store: ExploreStore = ExploreStore()
+    @StateObject var store: ExploreStore
     
     var body: some View {
         VStack(spacing: 0) {
@@ -57,6 +56,7 @@ struct Explore: View {
         .task {
             store.dispatch(.onAppear)
         }
+        .toolbar(.hidden, for: .navigationBar)
     }
 }
 
@@ -114,7 +114,7 @@ extension Explore {
                 title: "등록하러 가기",
                 disabled: .constant(false)
             ) {
-                navigationManager.selectedTab = .register
+                store.dispatch(.goRegisterButtonTapped)
             }
             .padding(.top, 18)
             
@@ -130,7 +130,7 @@ extension Explore {
                         .padding(.bottom, 12)
                         .padding(.horizontal, 20)
                         .onTapGesture {
-                            navigationManager.push(.detailView(postId: list.postId))
+                            store.dispatch(.cellTapped(list))
                         }
                 }
             }
